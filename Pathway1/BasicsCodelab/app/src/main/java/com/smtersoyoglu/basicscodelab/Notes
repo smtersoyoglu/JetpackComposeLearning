@@ -1,0 +1,59 @@
+
+- Jetpack Compose, kullanıcı arayüzü geliştirmeyi basitleştirmek için tasarlanmış modern bir araç setidir.
+Reaktif bir programlama modelini Kotlin programlama dilinin özlülüğü ve kullanım kolaylığı ile birleştirir.
+Tamamen bildirimseldir, yani verileri bir UI hiyerarşisine dönüştüren bir dizi işlevi çağırarak UI'nizi tanımlarsınız.
+Temel veriler değiştiğinde, çerçeve bu işlevleri otomatik olarak yeniden çalıştırarak UI hiyerarşisini sizin için günceller.
+
+- @Composable -> fonksiyonu arayüzü temsil eder, eğer Composable özelligi olmayan bir fonksiyon olusturursak o fonksiyon ekranda
+bir görünüm olusturmaz, fonksiyon iceriginin bir görünüm olusturmasını istiyorsak bu @Composable etiketini fonksiyonun basina vermemiz gerekir.
+
+- @Preview -> yaptıgımız tasarımları görmemizi saglar ide'de, @Composable etikini vererek olusturdugumuz arayüz tasarımın nasıl göründügünü
+yanda gorebiliriz.
+
+- Column -> icerisinde ki elemanları alt altta sıralamaya yarar. ( satırları dikey olarak yerleştirir.) Ornegin; birden fazla Text yazdırıcaz
+Column kullanmadan direk yazarsak Text de ki metinler üst üstte binecektir ama Column icerisinde yazarsak alt altta görünüm saglayacaktir.
+Column {
+    Text(text="Jetpack")            Jetpack
+    Text(text="Compose")            Compose
+}
+
+
+- fillMaxSize() -> bütün ekrana yayıl demek (dikey ve yatay da)
+- fillMaxWidth() -> sadece yatay da her yere yayılır.
+- fillMaxHeight() -> sadece dikey de her yere yayılır.
+- padding() -> kenarlardan bosluk bırakmaya yarar, ornegin; padding(25.dp) -> kenarlar dan 25dp'lik bosluk bırakır.
+- horizontalAlignment = Alignment.CenterHorizontally -> yatay'da ortlamaya yarar, ornegin metinleri
+Column(horizontalAlignment = Alignment.CenterHorizontally) kullandik icerisinde kullandıgımız metinler bunu kullanmasaydık sola yatık olarak gözükecekti
+bu kod ile yatayda ortalayarak gösterir
+- verticalAlignment = Alignment.Center -> dikey de ortalama, Alignment. dan sonra bircok özellik var bakabiliriz.
+- verticalAlignment = Alignment.spacedBy(8.dp) -> spacedBy(space) özelligi vertical da vardir, horizontal da yok, bu özellik dikeyde kullandigimiz elemanlar arasinda dikey de
+bosluk bırakmaya yarar, ornegin Jetpack Compose alt altta gözüküyor onlar arasında ki dikey bosluk 8dp olarak ayarladik.
+
+- Selectable Text (Kopyalanabilir, Secilebilir metin) -> bir metnin kopyalanabilir olmasını istiyorsak SelectionContainer {} icerisinde yazmamız gerekiyor,
+
+SelectionContainer { //SelectionContainer-> secilebilir, kopyalanabilir yapmak icin
+    Column{
+        Text(text="Jetpack")
+        DisableSelection { //-> DisableSelection-> secilemez, kopyalanamaz yapmak icin
+            Text(text="Compose")
+        }
+        // burda Jetpack metni kopyalanabilirken, Compose metni kopyalanamaz.
+    }
+}
+
+- Row -> yatay bir sekilde hizalamaya yarar. (sütunları yatay olarak yerleştirir)
+Row {
+    Text(text="Jetpack")            Jetpack Compose olarak gözükür.
+    Text(text="Compose")
+}
+
+- Box -> üst üstte hizalar, stack yapısı gibi
+Box(modifier = Modifier.fillMaxSize(), contentAligment = Aligment.Center) {
+
+    Box(modifier = Modifier.size(100.dp).background(Color.Red))
+    Box(modifier = Modifier.size(70.dp).background(Color.Yellow))
+    Box(modifier = Modifier.size(50.dp).background(Color.Blue))
+
+    // üst üstte kutuları gösterir.
+}
+
