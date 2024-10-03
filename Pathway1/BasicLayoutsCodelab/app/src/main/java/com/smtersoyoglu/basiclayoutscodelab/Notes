@@ -1,0 +1,95 @@
+Modifiers (Düzenleyiciler)
+Jetpack Compose'da, modifier adı verilen bir yapı kullanarak bir composable'ın (ekranda görünen bir UI elemanının) boyutunu, düzenini, davranışını ve görünümünü değiştirebilirsin.
+
+Neler Yapabilirsin?
+Boyut ve düzen: Bir bileşenin genişliğini, yüksekliğini ya da pozisyonunu ayarlayabilirsin.
+Görünüm ve davranış: Bir bileşenin nasıl görüneceğini veya nasıl tepki vereceğini (örn. tıklanabilir, kaydırılabilir, sürüklenebilir) belirleyebilirsin.
+Erişilebilirlik: Erişilebilirlik etiketleri gibi ekstra bilgiler ekleyebilirsin.
+Kullanıcı girdisi: Bileşenlerin kullanıcılardan nasıl veri alacağını tanımlayabilirsin.
+Her composable bileşenin bir modifier parametresi vardır. Bu parametreyi kullanarak, bir bileşenin görünümünü ve davranışını uyarlayabilirsin.
+Ayrıca birden fazla modifier'ı bir arada zincirleyerek (birbirine ekleyerek) daha karmaşık davranışlar oluşturabilirsin.
+
+
+Bu metni daha anlaşılır bir şekilde açıklayalım:
+
+Bileşenlerin Konteyner İçinde Hizalanması
+Jetpack Compose'da bir bileşeni (composable) yatay ya da dikey olarak hizalamak istiyorsan, bileşenin bulunduğu kapsayıcıya (container) hizalama kurallarını tanımlarsın. Bu sayede, her bileşenin kendini nasıl hizalayacağını belirlemek yerine, kapsayıcıya bu görevi vermiş olursun.
+
+Farklı konteyner tiplerinde hizalamayı şu şekilde yapabilirsin:
+
+1. Column (Dikey düzen)
+Column'da çocuk bileşenlerin nasıl yatay olarak hizalanacağını belirlersin.
+
+Yatay hizalama seçenekleri:
+
+Start: Çocuk bileşenler, Column'un sol tarafına hizalanır.
+CenterHorizontally: Çocuk bileşenler yatay olarak ortalanır.
+End: Çocuk bileşenler, Column'un sağ tarafına hizalanır.
+Örnek:
+Column(
+    horizontalAlignment = Alignment.CenterHorizontally
+) {
+    Text("Bu metin ortalanmış!")
+}
+
+2. Row (Yatay düzen)
+Row'da çocuk bileşenlerin nasıl dikey olarak hizalanacağını belirlersin.
+
+Dikey hizalama seçenekleri:
+
+Top: Çocuk bileşenler, Row'un üst tarafına hizalanır.
+CenterVertically: Çocuk bileşenler dikey olarak ortalanır.
+Bottom: Çocuk bileşenler, Row'un alt tarafına hizalanır.
+Örnek:
+
+Row(
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Text("Bu metin dikeyde ortalanmış!")
+}
+
+3. Box (Hem yatay hem dikey hizalama)
+Box'ta hem yatay hem de dikey hizalamayı aynı anda ayarlayabilirsin.
+
+Hem yatay hem de dikey hizalama seçenekleri:
+
+TopStart, TopCenter, TopEnd
+CenterStart, Center, CenterEnd
+BottomStart, BottomCenter, BottomEnd
+Örnek:
+
+Box(
+    contentAlignment = Alignment.Center
+) {
+    Text("Bu metin tamamen ortalanmış!")
+}
+
+-- Surface composable'ı, Jetpack Compose'da belirli bir alanı çizmek ve stil vermek için kullanılır. Surface, bir arka plan rengi, şekil, gölge (elevation), kenarlık ve içerik için bir temel sağlar. Yani, belirli bir içerik için görsel bir yüzey veya kap oluşturur.
+
+- Surface Kullanım Amaçları:
+* Arka Plan Rengi Ayarlama: Surface, içerdiği bileşenin arka plan rengini belirleyebilir.
+
+
+Surface(color = Color.LightGray) { /* İçerik */ }
+* Şekil Verme: Yüzeye belirli bir şekil verebilirsiniz (örneğin, yuvarlatılmış köşeler).
+
+
+Surface(shape = RoundedCornerShape(8.dp)) { /* İçerik */ }
+* Gölgelendirme (Elevation): Surface, belirli bir yükseklik (elevation) vererek bir gölge etkisi yaratabilir. Bu, kart tasarımları ve malzeme tasarım öğeleri için sıklıkla kullanılır.
+
+
+Surface(elevation = 4.dp) { /* İçerik */ }
+* Kenarlık ve Arka Plan ile İlişkilendirme: İçeriklerin daha düzenli ve tanımlı görünmesini sağlar. Bir bileşenin arka planını, kenarlarını ve gölgesini diğerlerinden ayırmak için kullanılır.
+
+- Örnek:
+Surface(
+    shape = RoundedCornerShape(8.dp), // Köşeleri yuvarlak bir kart gibi şekillendirir
+    color = MaterialTheme.colorScheme.surface, // Arka plan rengi sağlar
+    elevation = 4.dp, // Yükseklik vererek gölge oluşturur
+) {
+    Text(text = "This is a Surface")
+}
+- Neden Surface Kullanılır?
+* Material Design Uygunluğu: Surface, Google'ın Material Design kılavuzlarına uygun olarak içeriklerin nasıl görüneceğini düzenler (örneğin, kartlar, diyaloglar, ve butonlar gibi).
+Birlikte Çalışabilirlik: Diğer bileşenlerin üzerine gölge ve stil eklemek için kullanılabilir, yani Surface composable’ları daha temiz ve yapılandırılmış hale getirir.
+Görsel Hiyerarşi: İçeriğe gölge veya renk gibi özellikler ekleyerek farklı öğeleri görsel olarak vurgulamak için kullanılır.
