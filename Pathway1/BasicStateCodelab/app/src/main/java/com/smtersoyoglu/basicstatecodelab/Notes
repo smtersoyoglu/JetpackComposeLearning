@@ -1,0 +1,285 @@
+3. Compose'da State (Durum)
+- Bir uygulamanın "state" (durumu), zamanla değişebilen herhangi bir değerdir. (State, herhangi bir zamanda kullanıcı arayüzünde neyin gösterileceğini belirler.)
+Bu oldukça geniş bir tanımdır ve bir Room veritabanından bir sınıftaki değişkene kadar her şeyi kapsar.
+
+* Tüm Android uygulamaları, kullanıcıya bir durumu gösterir. Android uygulamalarındaki duruma dair birkaç örnek:
+- Bir sohbet uygulamasında alınan en son mesajlar.
+- Kullanıcının profil fotoğrafı.
+- Bir öğe listesindeki kaydırma pozisyonu.
+Ana fikir: State, belirli bir anda UI'de neyin gösterileceğini belirler.
+
+/***********************************************************************************************************************************************************************************************************************/
+
+4. Compose'da Olaylar (Events)
+- Bir önceki bölümde, zamanla değişebilen her türlü değerin "state" (durum) olduğunu belirtmiştik,
+örneğin bir sohbet uygulamasında alınan son mesajlar. Peki, durumu ne değiştirir? Android uygulamalarında durum, olaylara yanıt olarak güncellenir.
+
+* Olaylar, uygulamanın içinden veya dışından gelen girdilerdir. Örneğin:
+- Kullanıcının UI ile etkileşime girmesi (örneğin, bir düğmeye basması).
+- Sensörlerden gelen yeni bir değer veya ağ yanıtları gibi diğer faktörler.
+
+Uygulamanın durumu, UI'de neyin görüntüleneceğini tanımlarken; olaylar(eventler), durumu değiştiren mekanizmadır ve bu değişiklikler UI'nin güncellenmesine neden olur.
+
+Ana fikir: Durum sabittir. Olaylar gerçekleşir.
+
+* Olay Döngüsü
+Bir programın bir bölümüne bir olayın gerçekleştiğini bildiren mekanizmalar vardır. Tüm Android uygulamalarında temel bir UI güncelleme döngüsü şu şekilde işler:
+1- Olay - Olay, kullanıcı veya programın başka bir kısmı tarafından tetiklenir.
+2- Durum Güncellemesi - Bir olay yöneticisi, UI tarafından kullanılan durumu değiştirir.
+3- Durumu Gösterme - UI, yeni durumu gösterecek şekilde güncellenir.
+Compose'da durumu yönetmek, durum ve olayların birbirleriyle nasıl etkileşimde olduğunu anlamakla ilgilidir.
+
+/***********************************************************************************************************************************************************************************************************************/
+
+5. Memory in a composable function  (Composable Fonksiyonda Bellek)
+*   State: Uygulamanın belirli bir anında gösterilen veri. Örneğin, kaç bardak su içildiği gibi bir sayı.
+*   Recomposition: Veri değiştiğinde, Compose ilgili ekran parçalarını yeniden oluşturur. Yani, state değiştikçe, UI (kullanıcı arayüzü) da buna göre güncellenir.
+
+*   Recomposition Nedir?
+- Bir recomposition, uygulamanın state'inde bir değişiklik olduğunda, Compose'un belirli bir UI parçasını yeniden oluşturması anlamına gelir.
+Ama sadece state ile etkileşimde olan parçalar yeniden oluşturulur, tüm UI değil. Böylece, sadece gerekli olan kısımlar güncellenir ve performans artırılır.
+
+*   State Nasıl Yönetilir?
+- Compose, state'i izlemek için 'mutableStateOf' ve 'remember' gibi yardımcı fonksiyonlar sağlar.
+Bu fonksiyonlarla state'i güncel tutabilir ve her değişiklikte ekranın doğru kısımlarını yeniden oluşturabiliriz.
+
+
+1. Composition (Kompozisyon) ve Recomposition (Yeniden Kompozisyon)
+- Jetpack Compose, UI’yı oluştururken composition dediğimiz bir işlem yapar. Bu, Compose’un composable fonksiyonları çalıştırarak UI’yi oluşturduğu süreçtir. UI’yi temsil eden bu yapıya Composition denir.
+
+- Initial Composition (İlk Kompozisyon): Composable fonksiyonlar ilk defa çalıştırıldığında oluşan kompozisyon. Uygulama başladığında ekranda gördüğün ilk hal.
+- Recomposition (Yeniden Kompozisyon): UI'daki veriler (state) değiştiğinde Compose, ilgili composable fonksiyonları yeniden çalıştırır ve UI'yi günceller.
+Ama sadece değişen verilere bağlı olan composable'lar yeniden oluşturulur, tüm UI değil.
+
+Bu, uygulamanın sadece gerekli kısımlarının güncellenmesini sağlar, bu sayede performans iyileşir.
+
+2. State Takibi
+- Compose, UI'da gösterilen veriyi (state) takip eder ve bu veri değiştiğinde hangi UI bileşenlerinin yeniden oluşturulması gerektiğini bilir.
+State, uygulamanın bir anlık durumunu temsil eder ve MutableState tipiyle değiştirilebilir bir durumu oluştururuz.
+
+- Jetpack Compose, state’i hem okuma (read) hem de yazma (write) işlemlerini takip eder. Bir state değiştiğinde (örneğin bir butona tıkladığında) sadece bu state’i okuyan composable'lar yeniden çalıştırılır.
+
+3. mutableStateOf Fonksiyonu
+- mutableStateOf fonksiyonu, bir değeri MutableState olarak sarar ve bu değer değiştiğinde Compose, UI’yi otomatik olarak günceller. Compose’da state yönetimini sağlamak için mutableStateOf kullanırız.
+
+/***********************************************************************************************************************************************************************************************************************/
+
+
+6. State Driven UI (State Odaklı UI)
+- Jetpack Compose, deklaratif bir UI framework'ü. Yani geleneksel Android'deki gibi UI elemanlarını elle kaldırmak veya görünürlüklerini değiştirmek yerine,
+UI'ı belirli bir state (durum) altında nasıl görünmesi gerektiğini tarif ediyorsun. Bu da, uygulamanın durumu değiştikçe, UI'ın otomatik olarak yeniden oluşturulmasını sağlar.
+
+* Recomposition Nedir?
+- State değiştiğinde, Compose recomposition yapar. Bu, UI'nın belirli bölümlerinin yeniden oluşturulması anlamına gelir.
+Yani sadece state'e bağlı olan ve değişiklik geçiren UI elemanları yeniden çizilir. Bu da gereksiz yere tüm ekranı yeniden çizmemesi demek.
+Bu süreçte bazı composable fonksiyonlar Composition (yani UI yapısı) içine dahil olabilir ya da çıkarılabilir.
+
+* Composable'ların Composition İçinde Yer Alması
+Bir composable fonksiyon, state’e bağlı olarak çağrıldığında Composition’da yer alır. Eğer bir fonksiyon (örneğin if yapısında bir koşul sağlanmadığı için) çağrılmıyorsa, o fonksiyon Composition’da yer almaz.
+
+Örneğin: Eğer bir Text composable'ı sadece belirli bir koşul sağlandığında çizilecekse (örneğin count > 0 olduğunda), bu Text UI'da yalnızca bu koşul gerçekleştiğinde yer alır, diğer durumda olmaz.
+
+*   UI ve UI State İlişkisi
+- UI, kullanıcının ekranda gördüğü şeydir. UI state ise, uygulamanın kullanıcının ne görmesi gerektiğini belirten durumudur.
+- UI ve state birbirine bağlıdır: state değiştiğinde, UI otomatik olarak güncellenir ve değişiklik kullanıcıya yansır.
+- Bu sayede, UI’da nelerin gösterileceği, tamamen uygulamanın o anki durumuna göre belirlenir.
+
+/***********************************************************************************************************************************************************************************************************************/
+
+7. Remember in Composition
+
+Bu bölümde, Jetpack Compose'da remember fonksiyonunu nasıl kullanacağını anlatacağız ve aynı zamanda uygulamaya yeni bir işlev ekleyeceğiz.
+
+*   Remember ve Composition
+- remember: Jetpack Compose'da state'i (durumu) hatırlamak için kullanılır. Bir composable'ın tekrar çizilmesi gerektiğinde (recomposition), remember ile saklanan değer kaybolmaz.
+Ancak eğer remember çağrıldığı yer bir sonraki recomposition'da çalıştırılmazsa, o zaman değer unutulur.
+- Örneğin, bir değişkenin state'ini hatırlamak ve bu state'i ekranda göstermek için kullanabilirsin.
+
+
+/***********************************************************************************************************************************************************************************************************************/
+
+8. Restore state in Compose (Compose'da Durumun Geri Yüklenmesi)
+Uygulamanı çalıştır ve birkaç bardak su ekle. Sonrasında cihazını döndür (yatay veya dikey moda çevir). Eğer cihazının "Otomatik Döndürme" ayarı açıksa,
+bu döndürme işlemi sırasında aktivitenin yeniden oluşturulduğunu fark edeceksin. Ancak, sayacın sıfırlandığını ve önceki su içme sayısının kaybolduğunu göreceksin.
+Bu durum, Android'in yapılandırma değişikliği (örneğin, cihazın döndürülmesi) sırasında aktiviteyi yeniden oluşturmasından kaynaklanır.
+
+-   Durumun Kaybolmasına Yol Açan Diğer Senaryolar;
+Cihazı döndürme dışında, şu durumlarda da Activity yeniden oluşturulabilir:
+*   Dil değiştirme
+*   Karanlık ve aydınlık modlar arasında geçiş
+*   Diğer yapılandırma değişiklikleri
+
+Bu gibi durumlar, sadece remember kullanarak saklanan durumun unutulmasına yol açar.
+remember yalnızca yeniden "composure" sırasında durumu hatırlatır, ancak yapılandırma değişikliği olduğunda (örneğin cihaz döndüğünde) Activity yeniden oluşturulacağı için durum sıfırlanır.
+
+-   rememberSaveable Kullanarak Durumun Geri Yüklenmesi
+Yukarıda bahsettiğimiz sorunları çözmek için, rememberSaveable kullanılır. rememberSaveable, verileri Bundle içinde saklayarak, yapılandırma değişikliklerinden sonra bile veriyi saklamaya devam eder.
+
+Bu sayede:
+*   Aktivite yeniden oluşturulsa bile (örneğin cihaz döndürme, dil değiştirme vb.), sayaç sıfırlanmaz.
+*   rememberSaveable, Bundle içinde saklanabilir tüm değerleri otomatik olarak kaydeder.
+
+-   Bundle, Android'de veri saklamak ve paylaşmak için kullanılan bir veri yapısıdır.
+Jetpack Compose'da rememberSaveable kullanarak Bundle aracılığıyla bileşenlerin durumlarını kaydedip yapılandırma değişikliklerine karşı koruyabilirsin. Bundle'ın Kullanım Alanları; Activity Yeniden Oluşturulması
+Yapılandırma değişikliği (örneğin cihazın döndürülmesi) olduğunda, bir Activity yeniden oluşturulur. Bu süreçte, Activity'nin eski durumu Bundle içine kaydedilir ve yeniden oluşturulduğunda geri yüklenir.
+Activity'ler Arası Veri Aktarımı: Bir Activity'den başka bir Activity'ye veri aktarmak istediğinde, Bundle'ı kullanarak verileri diğer Activity'ye iletebilirsin.
+
+-   Yapılandırma Değişikliklerinde Durumun Kaybolmasını Engelleme
+Bu şekilde rememberSaveable kullanarak, cihaz döndürüldüğünde veya diğer yapılandırma değişikliklerinde,
+su içme sayacı sıfırlanmaz ve kaldığı yerden devam eder. Uygulamanı şimdi çalıştırıp cihazı döndürdüğünde, sayaçta bir değişiklik olmadığını göreceksin.
+
+-   Hangi Durumu Ne Zaman Kullanmalı?
+*   remember: Bileşen yeniden oluşturulsa bile durumu hatırlamak için kullanılır, ancak yapılandırma değişikliklerinde durumu kaybeder.
+*   rememberSaveable: Hem yeniden oluşturmalarda hem de yapılandırma değişikliklerinde durumu saklamak için kullanılır.
+Bu iki seçenek arasındaki farkları anlamak, uygulamanın kullanıcı deneyimini iyileştirmek için önemlidir.
+Örneğin, kullanıcı bir aktiviteyi döndürdüğünde sayfanın sıfırlanması istenmeyen bir deneyim olabilir, bu nedenle rememberSaveable tercih edilir.
+
+/***********************************************************************************************************************************************************************************************************************/
+
+9. State hoisting
+-   State Hoisting Nedir?
+State hoisting, Jetpack Compose'da state (durum) yönetimi için kullanılan bir desendir. Basitçe ifade etmek gerekirse,
+bir bileşenin (composable) içindeki durumu dışarı taşıyarak bileşeni stateless (durumsuz) hale getirme işlemidir. Bu sayede, bileşenler daha yeniden kullanılabilir ve test edilebilir olur.
+
+-   Neden State Hoisting Kullanılır?
+Bir bileşen kendi durumunu yönetiyorsa, bu bileşen stateful (durumlu) olur ve bu durumda bileşeni test etmek, başka yerlerde yeniden kullanmak zorlaşır.
+Ancak stateless bir bileşen, kendi durumunu dışarıdan alır ve bu yüzden daha esnek, yeniden kullanılabilir ve test edilebilir olur.
+
+-   State Hoisting'de, bileşen kendi içinde bir state tutmaz. Bunun yerine, bileşen dışarıdan aldığı iki parametreyle durumu yönetir:
+* value: Gösterilecek mevcut değeri belirler.
+* onValueChange: Durumun nasıl değişeceğini kontrol eder, yani bir olay olduğunda durumu dışarıya bildirir.
+
+-   Tek Yönlü Veri Akışı (Unidirectional Data Flow)
+*  Statelerin aşağı, eventlerin yukarı aktığı bir design paterndir. State hoisting, bu design pattern'i nasıl implement edeceğimizdir.
+State hoisting ile yapılan bu düzenleme, Tek Yönlü Veri Akışı (Unidirectional Data Flow, UDF) modelinin uygulanmasını sağlar. Bu modelde:
+* State (durum) dışarıdan içeriye doğru akar (state goes down).
+* Eventler (olaylar) yukarı doğru iletilir (events go up).
+Bu mimari, Compose bileşenlerinin veri akışını daha düzenli ve kontrol edilebilir hale getirir.
+
+-   State Hoisting Avantajları
+1- Single source of truth (Tek Kaynak): Durum yalnızca bir yerde tutulur, bu da hata yapma riskini azaltır.
+Birden fazla duplicate state kullanmaktansa state'i yukarı kaldırdığımız için tek bir kaynağı olacak. Bu bugları ve hataları azaltır.
+2- Shareable (Paylaşılabilirlik): Hoisted state (dışarı taşınmış durum) birden fazla bileşenle paylaşılabilir. State hoisting ile bir state'i birden fazla composable içinde kullanabiliriz.
+3- Interceptable (Engellenebilirlik): Stateless bileşene gelen olaylar (onValueChange), olay gerçekleşmeden önce engellenebilir veya değiştirilebilir.
+Stateless composable fonksiyonları çağıran yapılar state değişmeden önce eventleri değiştirebilir veya iptal edebilir. Bu da daha müdahale edebilir olmasını sağlar.
+4- Decoupled (Bağımsızlık): Bir stateless bileşenin durumu herhangi bir yerden, örneğin bir ViewModel’den yönetilebilir. Stateless composable fonksiyonlar için stateler her yerde saklanabilir. Bu da ayrıştırmayı sağlar. ViewModel vs.
+
+*   State hoisting, bir bileşenin daha basit ve yeniden kullanılabilir olmasını sağlamak için state'i dışarıya taşımak anlamına gelir.
+Böylece, bileşenler kendi içinde durum tutmaz ve dışarıdan gelen verilere göre davranır. Bu, Jetpack Compose'da uygulamaların daha kolay yönetilmesini, test edilmesini ve hata ayıklanmasını sağlar.
+
+
+- Jetpack Compose'da stateful (durumlu) ve stateless (durumsuz) composable kavramları, esnek, yeniden kullanılabilir ve sürdürülebilir kullanıcı arayüzleri oluşturmak için önemlidir.
+-   Durumsuz (Stateless) Composables
+Durumsuz composable:
+
+* Kendi durumunu yönetmez, durumu saklamaz.
+* Durumu ve olayları parametreler aracılığıyla alır.
+* Yeniden kullanılabilir, çünkü belli bir duruma bağlı değildir.
+Durumsuz composable'ların en büyük avantajı yeniden kullanılabilirliktir. Kendi durumlarını yönetmedikleri için farklı yerlerde, farklı durumlarla kullanılabilirler.
+
+-   Durumlu (Stateful) Composables
+Durumlu composable:
+
+* Kendi durumunu yönetir ve bu durumu zamanla günceller.
+* Durumu yöneterek içsel olarak tutar.
+* Daha az yeniden kullanılabilir, ancak çağıranın durumu yönetmesi gerekmediği durumlarda faydalıdır.
+
+/***********************************************************************************************************************************************************************************************************************/
+
+11. Observable MutableList
+-   Wellness Görevlerini Silmek için Observable MutableList Kullanımı
+Wellness uygulamasında görevleri silme işlevini eklemek için, Compose'un gözlemleyebileceği bir MutableList yapısını kullanmamız gerekiyor.
+Böylece, listedeki değişiklikler (görev ekleme veya silme gibi) otomatik olarak takip edilir ve kullanıcı arayüzü yeniden oluşturulur.
+
+-   Jetpack Compose'da Observable MutableList Nedir?
+* Mutable List: Değiştirilebilir bir liste. Yani, listeye öğe ekleyip çıkarabilirsin.
+Fakat, normal ArrayList veya mutableListOf kullanırsan, Compose bu değişiklikleri fark etmez ve kullanıcı arayüzünü güncellemez (recompose yapmaz). Bu yüzden Compose’un gözlemleyebileceği bir liste yapısına ihtiyacın var.
+
+-   Observable MutableList Nasıl Oluşturulur?
+* toMutableStateList(): Elindeki bir listeyi, Compose tarafından gözlemlenebilecek bir yapıya dönüştürmek için bu fonksiyonu kullanabilirsin. Bu şekilde liste değiştiğinde UI güncellenir.
+* mutableStateListOf(): Bu da doğrudan gözlemlenebilir bir liste yaratmak için kullanabileceğin başka bir yöntemdir.
+
+-   Özetle:
+* toMutableStateList() ve mutableStateListOf() Compose ile gözlemlenebilir listeler yaratır.
+* Listeler değiştikçe UI otomatik olarak güncellenir.
+* Key'ler kullanarak öğelerin durumunu doğru bir şekilde yönetirsin.
+* Büyük veri yapıları için ViewModel gibi daha uygun yapıları kullanman gerekir.
+
+/***********************************************************************************************************************************************************************************************************************/
+
+12. State in ViewModel
+-   ViewModel ile State Yönetimi
+Jetpack Compose'da, ekranın göstereceği veriler UI state olarak adlandırılır. Bu veriler genellikle uygulamanın veri katmanından gelir ve ekranlar arası veri değişiminde rol oynar.
+
+-   UI state, sadece ekranda neyin gösterileceğini belirlerken; uygulamanın davranışını kontrol eden iki ana mantık türü vardır:
+1- UI Logic (Kullanıcı Arayüzü Mantığı): Ekranda durumu nasıl gösterdiğimizle ilgilenir (örn. navigasyon ya da uyarı gösterme).
+2- Business Logic (İş Mantığı): Durum değişikliklerine nasıl tepki verileceğini belirler (örn. ödeme işlemi yapma veya kullanıcı tercihlerini kaydetme).
+
+-   ViewModel'in Rolü
+* ViewModel, UI state’i yönetir ve business logic'i uygulamanın diğer katmanlarından çağırır.
+* ViewModel, konfigürasyon değişikliklerinden (örneğin cihaz döndürme) etkilenmez ve UI bileşenlerinin ömründen daha uzun süre yaşar.
+
+-   UI State ve İş Mantığını ViewModel’e Taşımak
+UI ve iş mantığını ViewModel'e taşımanın avantajları şunlardır:
+* UI state dışarıdan direkt olarak değiştirilemez.
+* Business logic (iş mantığı), UI bileşenlerinden ayrılarak daha temiz ve test edilebilir bir yapı sağlar.
+
+/***********************************************************************************************************************************************************************************************************************/
+1. State (Durum) Nedir?
+State, uygulamanın bir anlık halini temsil eden veridir. Örneğin, bir sayaç uygulamasında, kaç kere bir butona basıldığını tutan sayı (counter) state'tir.
+
+Örnek Durum:
+Diyelim ki bir su sayacı uygulaması yapıyorsunuz. Bu uygulama, kullanıcıya kaç bardak su içtiğini gösterecek.
+Burada su bardağı sayısı bizim state'imizdir, çünkü bu veri zaman içinde değişir ve her değişiklikte kullanıcıya gösterilmesi gerekir.
+        var count = 0
+Yukarıdaki satırda count adında bir değişken oluşturduk. Bu değişken, kaç bardak su içildiğini tutar, yani bizim state'imizdir. Ancak bu sadece bir başlangıç,
+çünkü Jetpack Compose'da state'in izlenebilmesi ve değiştiğinde UI'yı güncellemesi için özel bir mekanizmaya ihtiyacımız var.
+
+2. State'in İzlenmesi ve Güncellenmesi
+Jetpack Compose, UI'nızda gösterilen state'i izler ve bir değişiklik olduğunda otomatik olarak ekranı günceller. Ancak bunun için state'i nasıl tanımlayacağınızı ve nasıl izleneceğini bilmeniz gerekiyor.
+
+Bunu yapmak için mutableStateOf() fonksiyonunu kullanıyoruz. Bu fonksiyon, bir değeri state olarak işaretler ve değiştiğinde Compose'un ekranı güncellemesini sağlar.
+
+Örnek:
+        val count = mutableStateOf(0)
+Burada count değişkenini mutableStateOf(0) ile tanımlıyoruz. Bu, başlangıç değeri 0 olan bir state oluşturur ve değişiklik olduğunda UI'yi bilgilendirir.
+
+
+3. remember Fonksiyonu ile State'i Hatırlamak
+State değiştiğinde ekranın yeniden oluşturulması gerekiyor (bu işleme recomposition diyoruz). Ancak, her yeniden oluşturma sırasında state sıfırlanabilir,
+yani tüm bilgiler kaybolabilir. Bu durumu önlemek için remember fonksiyonunu kullanırız.
+
+remember, bir değeri ilk oluşturduğumuzda hatırlar ve yeniden oluşturma (recomposition) sırasında bu değeri kaybetmememizi sağlar. Yani, count değeri sıfırlanmaz, önceki değerini hatırlar.
+
+Örnek:
+        val count = remember { mutableStateOf(0) }
+Burada, remember ve mutableStateOf'u birlikte kullanıyoruz. Böylece count her değiştiğinde hatırlanır ve ekranı güncellemeye devam eder.
+
+
+4. Composable Fonksiyon ile State Kullanmak
+Şimdi bu bilgileri bir araya getirerek, su sayacı örneğini bir Composable fonksiyon ile yazalım. Composable fonksiyonlar, Compose'da UI elementlerini oluşturan fonksiyonlardır.
+@Composable
+fun WaterCounter(modifier: Modifier = Modifier) {
+    Column(modifier = modifier.padding(16.dp)) {
+        val count = remember { mutableStateOf(0) } // State'i hatırla ve takip et
+
+        Text("You've had ${count.value} glasses.") // Kaç bardak su içildiğini göster
+        Button(onClick = { count.value++ }, Modifier.padding(top = 8.dp)) {
+            Text("Add one") // Butona her tıklandığında count'u artır
+        }
+    }
+}
+
+Bu kod şu şekilde çalışır:
+
+- State tanımlama: count, başlangıç değeri 0 olan bir mutableState. Bu state her değiştiğinde UI güncellenir.
+- remember kullanımı: remember, count değerini hatırlar. Böylece bir recomposition olduğunda bu değer sıfırlanmaz.
+- UI gösterme: Text bileşeni, kullanıcıya kaç bardak su içildiğini gösterir. Button bileşeni, tıklandığında count değerini artırır.
+
+Özet:
+* State: Uygulamanızın belirli bir anındaki veri. (Örn: su sayısı)
+* Recomposition: State değiştikçe sadece gerekli UI parçalarını yeniden oluşturma işlemi.
+* remember ve mutableStateOf: State'i izlemek ve hatırlamak için kullanılan Compose araçları.
+
+Delegated Properties ile kodu sadeleştirerek daha kolay okunabilir hale getirebiliriz.
+Bu yapı, Jetpack Compose ile kullanıcı etkileşimlerine (buton tıklamaları gibi) dayalı olarak UI'yı güncellemenin temel yoludur.
