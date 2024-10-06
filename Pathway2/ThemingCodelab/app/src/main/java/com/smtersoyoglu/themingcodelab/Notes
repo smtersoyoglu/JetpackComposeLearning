@@ -1,0 +1,209 @@
+
+-   Theming in Compose with Material 3
+
+Jetpack Compose'da temalarla çalışmak, uygulamanın görünüm ve hissiyatını markana göre özelleştirmeyi sağlar.
+Jetpack Compose’daki Material 3 teması, uygulamanın görünümünü daha fazla kişiselleştirmeni sağlar.
+Renkler, yazı tipleri ve şekiller gibi bileşenleri özelleştirerek uygulamanın markasına uygun bir arayüz oluşturursun.
+-   Material 3 Nedir?
+Jetpack Compose, Google’ın Material Design tasarım sistemini kullanarak kullanıcı arayüzlerini oluşturmanı sağlar.
+Material Design, butonlar, kartlar, anahtarlar (Switches) gibi bileşenleri içeren, dijital ürünler tasarlamaya yönelik bir kılavuzdur.
+Bu tasarım sistemini uygulamana entegre ettiğinde, uygulamanın modern ve tutarlı bir arayüze sahip olmasını kolaylaştırırsın.
+
+
+-   Material 3 Teması
+Material Theming ise, bu Material Design tasarımını kendi uygulamana uygun şekilde özelleştirmeni sağlar.
+Yani, uygulamanın markasına göre renkleri, yazı tiplerini ve şekilleri değiştirebilirsin. Compose’da bu tema sistemi,
+uygulamaya entegre ettiğin tüm bileşenlerde otomatik olarak görünür.
+
+-   Material 3 Teması Hangi Alt Sistemlerden Oluşur?
+1- Renk şeması (Color Scheme): Uygulamanın hangi renkleri kullanacağını belirler. Örneğin, butonların rengi, arka plan rengi vb.
+2- Yazı stili (Typography): Uygulamanın hangi yazı tiplerini kullanacağını ayarlarsın. Başlıklar, metinler, küçük yazılar gibi farklı yazı tipleri belirlenebilir.
+3- Şekiller (Shapes): Butonların köşe yuvarlaklığı veya kartların kenarları gibi görsel bileşenlerin şekillerini kontrol eder.
+Bu alt sistemleri özelleştirdiğinde, Compose'daki butonlar, kartlar gibi bileşenler otomatik olarak senin ayarlarına uygun şekilde görünmeye başlar.
+
+-   Renk Şemaları (Color Schemes)
+Material 3 temasında, beş temel anahtar renk vardır. Bu renkler şunlardır:
+
+1. Primary (Birincil)
+2. Secondary (İkincil)
+3. Tertiary (Üçüncül)
+4. Surface (Yüzey)
+5. Background (Arka plan)
+Her bir renk tonunun, farklı yoğunluklarda (açık, koyu) dört ayrı versiyonu vardır. Bu sayede uygulamanın hangi kısmında hangi renk tonunu kullanacağını seçebilirsin. Örneğin:
+
+* Primary: Uygulamanın genel rengi, marka rengi olarak kabul edilir.
+* Secondary: Yardımcı, tamamlayıcı renk.
+* Tertiary: Daha nadir kullanılan ama hala önemli olan üçüncü renk.
+
+-   Renk Şeması Oluşturma
+Kendi renk şemanı oluşturabilir ya da Material Theme Builder aracını kullanarak otomatik olarak bir şema oluşturabilirsin.
+Bu araç, uygulamanın marka renklerini (örneğin logo rengini) kullanarak renk şemaları oluşturur ve sana Jetpack Compose kodunu dışa aktarma imkanı verir.
+
+-   Renk Şemalarının Kodla Entegrasyonu
+Jetpack Compose’da temalandırmayı kullanmak için MaterialTheme() adlı bir bileşen var. Bu bileşeni tüm uygulamanın etrafına sararak temayı aktif hale getiriyorsun. İşte bu temayı AppTheme() adında bir fonksiyonda tanımlarsın. İki parametre alır:
+
+1- useDarkTheme: Sistem teması karanlık moda geçtiğinde buna göre uygulamanın temasını değiştirmene olanak tanır.
+2- content: Tema uygulanacak içeriktir (ekranın içeriği, bileşenler).
+
+-   MaterialTheme Nedir?
+MaterialTheme, Jetpack Compose’da uygulamanın görünümünü kontrol eden temel bileşendir.
+Renk şemaları, yazı stilleri ve şekiller gibi tematik özellikleri bu bileşen üzerinden uygulamanın içerisine ekleyebilirsin.
+
+-   Renk Rolleri ve Erişilebilirlik
+Material 3'te renk rollerini doğru kullanmak önemlidir. Renk rolleri, UI bileşenlerinin durumu, öne çıkması ve vurgusu gibi şeylere göre değişir:
+
+* Primary (Ana Renk): Öne çıkan bileşenlerde (örneğin butonlar) kullanılır.
+* Secondary (İkincil Renk): Daha az öne çıkan bileşenlerde (örneğin filtre butonları) kullanılır.
+* Tertiary (Üçüncül Renk): Zıtlık ve vurgu sağlamak için kullanılır.
+* Neutral (Nötr Renkler): Arka plan ve yüzeylerde kullanılır.
+Ayrıca, renklerin kullanıldığı yerlere bağlı olarak erişilebilirlik açısından doğru kontrastı sağlamak için çeşitli renk eşleştirmeleri vardır.
+Örneğin, onPrimary rengi, primary rengin üzerinde iyi bir kontrast sağlayacak şekilde seçilmelidir.
+
+!-!   Not: Materyal 3'te arka plan rengi tema boyunca tutarlıyken yüzey rengi statik değildir. Yüzey rengi, yüzeyin yüksekliğine bağlı olarak ana renkten ton alır.
+
+-   5. Adding dynamic colors in app
+
+Dinamik renk, bir algoritmanın kullanıcının duvar kağıdından uygulamalarına ve sistem kullanıcı arayüzüne uygulanmak üzere özel renkler türettiği Material 3'ün önemli bir parçasıdır.
+Dinamik temalar uygulamalarınızı daha kişisel hale getirir. Ayrıca kullanıcılara sistem temasıyla uyumlu ve sorunsuz bir deneyim sunar.
+Dinamik renk Android 12 ve üzeri sürümlerde kullanılabilir. Dinamik renk mevcutsa dynamicDarkColorScheme() veya dynamicLightColorScheme() kullanarak dinamik bir renk şeması ayarlayabilirsiniz.
+Değilse, varsayılan bir açık veya koyu ColorScheme kullanmaya geri dönmelisiniz.
+
+-   6. Typography
+
+Material Design 3, tipografi için bir ölçek tanımlar. Adlandırma ve gruplama, display, headline, title, body ve label
+olmak üzere basitleştirilmiştir ve her biri için büyük, orta ve küçük boyutlar bulunmaktadır.
+
+Uygulamanızda kullanacağınız beş tipografi stili vardır: headlineSmall, titleLarge, bodyLarge, bodyMedium ve labelMedium. Bu stiller, hem ana ekran hem de detay ekranını kapsayacaktır.
+
+-   Uygulanisi:
+Text(
+   text = "Hello M3 theming",
+   style = MaterialTheme.typography.titleLarge
+)
+
+Text(
+   text = "you are learning typography",
+   style = MaterialTheme.typography.bodyMedium
+)
+
+- 7. Şekiller (Shapes)
+Material Design'da kullanıcı arayüzü bileşenleri farklı şekillerde gösterilebilir. Bu şekiller, kullanıcıların dikkatini çeker, bileşenlerin ne olduğunu anlatır,
+ durumları belirtir ve uygulamanın markasını ifade eder.
+
+- Shapes Tanımlama
+Jetpack Compose, M3 (Material Design 3) ile yeni şekilleri tanımlamak için Shapes sınıfını kullanır.
+M3 Shape Scale (şekil ölçeği), farklı boyutlardaki şekilleri kolayca uygulamanı sağlar. Bu şekiller farklı boyutlarda olabilir:
+
+* Extra small (Çok Küçük)
+* Small (Küçük)
+* Medium (Orta)
+* Large (Büyük)
+* Extra large (Çok Büyük)
+
+Bu boyutlar varsayılan değerlerle gelir, ancak istersen kendi uygulaman için bu değerleri değiştirebilirsin.
+Örneğin, bir liste öğesine medium (orta) boyutta bir şekil vermek isteyebilirsin, ancak aynı zamanda başka şekilleri de tanımlayabilirsin.
+
+
+-   8. Emphasis
+
+Vurgu (Emphasis), kullanıcı arayüzünde (UI) belirli içerikleri diğerlerinden daha fazla öne çıkarmak için kullanılır.
+Örneğin, bir başlığı alt başlıklardan ayırmak istediğinde vurgu kullanarak dikkat çekebilirsin.
+
+
+Jetpack Compose'da vurgu eklemenin iki ana yolu vardır:
+
+- 1. Renklerle Vurgu Ekleme
+Material 3 (M3) renk sistemi, vurgu için farklı renkler ve "on-color" kombinasyonları sunar.
+Vurgu oluştururken surface, surface-variant, ve background renklerini ve bunların "on-color" versiyonlarını kullanabilirsin.
+
+* Surface rengi, on-surface-variant ile kullanılabilir, bu da daha düşük bir vurgu sağlar.
+* Surface-variant, on-surface ile birlikte kullanılabilir, bu da daha yüksek bir vurgu sağlar.
+Ayrıca, accent renkleri ile vurgu yapabilirsin, bu da renkleri belirginleştirir ancak yine de erişilebilir olur ve kontrast oranına uyum sağlar.
+Örnek:
+Surface rengi ve on-surface-variant: Az vurgu.
+Surface-variant ve on-surface: Daha fazla vurgu.
+
+- 2. Farklı Yazı Ağırlıklarıyla Vurgu Ekleme
+Yazı tipi ağırlıklarıyla da vurgu ekleyebilirsin. Typography bölümünde gördüğün gibi, yazı tiplerine özel ağırlıklar ekleyerek vurguyu artırabilirsin.
+Daha kalın yazı tipleri, belirli bir metni daha belirgin hale getirir.
+
+Text(
+   text = email.createdAt,  // Zaman bilgisi
+   style = MaterialTheme.typography.labelMedium,
+   color = MaterialTheme.colorScheme.onSurfaceVariant // Vurguyu azaltmak için onSurfaceVariant rengi
+)
+
+/** 8. Gesture animation (Dokunma Animasyonu) */
+Bu bölümde, Jetpack Compose ile dokunma girdilerine dayalı animasyonlar oluşturmayı öğreniyoruz. Özellikle,
+bir öğeyi parmakla kaydırarak ekranın dışına sürükleyip kaldırmayı sağlayan bir animasyon ekleyeceğiz.
+
+Adım Adım Açıklama
+1- Dokunma Olayları: Kullanıcı ekrana dokunduğunda, bu dokunma olayı x ve y koordinatları ile temsil edilir.
+Kullanıcı parmağını sağa veya sola hareket ettirdiğinde, öğenin de bu harekete göre konumunu değiştirmesi gerekir. Bu işlemi pointerInput kullanarak yaparız.
+
+2- Animatable Nedir?: Animatable, öğenin konumunu dokunma girdileriyle senkronize etmek için kullanabileceğimiz bir API'dir.
+Aynı zamanda mevcut bir animasyon devam ediyorsa ve kullanıcı dokunma olayı başlattıysa, animasyonu durdurabilir ve yeni dokunma olayına göre pozisyonu ayarlayabiliriz.
+
+3- swipeToDismiss Modifikatorünü Oluşturma:
+* Temel Mantık: Kullanıcı ekrana dokunup parmağını sürüklediğinde, öğe bu hareketi takip eder.
+Eğer hareket yeterince hızlı (fling) olursa, öğe ekrandan kaldırılır. Yeterince hızlı değilse, öğe eski yerine geri döner.
+
+4- Dokunma Girdilerini Yönetme:
+* Dokunma Başlangıcı: Kullanıcı dokunduğunda, önceki animasyonlar varsa bunlar durdurulur (offsetX.stop()). Bu sayede, öğe kullanıcı parmağını hareket ettirdikçe yeni konuma gider.
+* Sürükleme Hareketini Takip Etme: Kullanıcının sürükleme hareketini velocityTracker ile izleriz ve bu hareketi offsetX.snapTo() ile öğeye uygularız. Böylece, öğe parmak hareketine senkronize olur.
+* Fling Hareketi (Hızlı Kaydırma): Kullanıcı parmağını ekrandan kaldırdığında, hareketin hızı hesaplanır. Eğer hız yeterince yüksekse öğe kaldırılır, değilse başlangıç konumuna geri döner.
+
+6- Kaydırma Animasyonunu Yönetme:
+
+* Kullanıcının sürükleme hareketi sırasında, snapTo() kullanarak öğenin konumunu sürekli güncelleriz.
+* Sürükleme bittiğinde, hız düşükse öğe başlangıç konumuna geri döner. Eğer hız yeterince yüksekse, animateDecay() ile öğe ekrandan dışarı kaydırılır ve kaldırılır.
+
+7- Offset Uygulama: Son olarak, hesaplanan offsetX değerini öğeye uygulayarak, öğenin ekrandaki konumunu güncelleriz: .offset { IntOffset(offsetX.value.roundToInt(), 0) }.
+
+Sonuç
+Bu işlem sonucunda, kullanıcı öğeyi kaydırdığında öğe ya eski konumuna geri döner ya da kaydırma hareketi yeterince hızlıysa ekrandan tamamen kaldırılır.
+
+/***************************************************************************************************************************************************************************************************************/
+
+Composition, Jetpack Compose’da bir ekranın (veya UI’nin) oluşturulma aşamalarından biridir.
+En basit haliyle, kullanıcı arayüzünü birleştiren, yapı taşı diyebileceğimiz parçaların, yani Composable'ların oluşturulup ekrana yerleştirilmesidir.
+
+- Daha Detaylı Anlatım:
+Jetpack Compose, UI'yi farklı Composable fonksiyonlar kullanarak oluşturur. Her Composable, ekranın bir bölümünü temsil eder.
+Örneğin, bir buton, bir metin veya bir resim bileşeni olabilir. Bu parçaların birleştirilip bir UI’nin ortaya çıkma sürecine Composition denir.
+
+* Composable fonksiyonlar: UI bileşenlerini temsil eden, Compose'da tanımlanan özel fonksiyonlardır. Örneğin, Text(), Button(), Image() gibi Composable'lar, UI'nin çeşitli öğelerini oluşturur.
+* Bu aşamada, hangi bileşenlerin ekranda görüneceğine, hangilerinin hangi sırayla yerleştirileceğine karar verilir.
+
+- Composition Nasıl Çalışır?
+Jetpack Compose, bileşenlerin nasıl görüneceğine ve ekranda nasıl düzenleneceğine karar vermek için üç aşamalı bir süreci takip eder:
+
+* Composition (Bileşen oluşturma): Ekranda yer alacak UI öğelerinin (Composable'ların) belirlenme aşamasıdır.
+Bu aşamada Compose, Composable fonksiyonlarını çağırarak ekranın hangi öğelerden oluşacağını belirler.
+
+* Layout (Düzenleme): Belirlenen öğelerin ne kadar büyük olacağını ve nerede duracağını hesaplar.
+
+* Draw (Çizim): UI öğelerini ekranda çizme aşamasıdır.
+
+Özetle, Composition, bir ekranın yapı taşlarını, yani hangi öğelerin kullanılacağını ve nasıl bir araya getirileceğini belirleyen aşamadır. Bu aşamadan sonra, öğeler yerleştirilir ve ekrana çizilir.
+
+
+-   Jetpack Compose'da durumun (state) kullanıcı arayüzüne (UI) dönüştürülmesi süreci, şu üç aşamadan oluşur:
+
+1- Composition
+2- Layout
+3- Drawing
+
+Bu süreç şu şekilde işliyor:
+
+* Composition: Bu aşamada, Compose hangi UI öğelerinin oluşturulacağını belirler. Burada UI bileşenlerinin ağacı (UI tree) oluşturulur.
+
+* Layout: UI bileşenlerinin yerleştirilmesi ve boyutlandırılması gerçekleşir. Her bileşen, kendisi ve alt bileşenlerinin ne kadar yer kaplayacağını hesaplar.
+
+* Drawing: Son aşamada, bileşenler ekranda çizilir. Bu aşamada renkler, şekiller, yazılar gibi görsel öğeler ekranda gösterilir.
+
+
+/***************************************************************************************************************************************************************************************************************/
+
+-   size: Bileşenin boyutunu ayarlamak için kullanılır, ancak esnek davranır. Bileşen, bulunduğu düzenin sınırlarına uyarak boyutunu değiştirebilir.
+-   requiredSize: Bileşenin boyutunu zorunlu kılar ve verilen boyut kesinlikle uygulanır. Etrafındaki diğer bileşenlerden bağımsız olarak bu boyutu korur.
