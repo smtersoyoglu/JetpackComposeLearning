@@ -1,0 +1,269 @@
+
+
+-   Jetpack Compose'da "Data'dan UI'ya" (From data to UI) kavramı, bir kullanıcı arayüzünün nasıl oluşturulduğunu ve
+güncellendiğini açıklayan temel bir süreçtir. Bu süreç, Compose'un farklı aşamalarını anlamak için önemlidir.
+
+*   işte bu süreci adım adım basitçe anlatımı:
+
+    1. Data (Veri):
+Bu, uygulamanın temelini oluşturan bilgidir. Örneğin, bir kullanıcının profil bilgileri (isim, yaş, resim vb.) veya bir listede görüntülenen öğeler.
+Compose, bu verilerde bir değişiklik olduğunda arayüzü otomatik olarak güncelleyebilir. Yani, veri değişirse, UI (kullanıcı arayüzü) de buna göre değişir.
+
+    2. Composition (Bileşim):
+Bu aşama, verilerin kullanıcıya nasıl gösterileceğinin belirlenmesidir. Compose, hangi bileşenlerin (örneğin, metin, buton, resim) kullanılması gerektiğine karar verir
+ve bu bileşenleri oluşturur. Burada, arayüzü oluşturan @Composable fonksiyonlar devreye girer. Bu fonksiyonlar, ekrana neyin çizileceğini belirler.
+
+* Örneğin, bir kullanıcının adını göstermek için bir Text bileşeni kullanırsın:
+@Composable
+fun UserName(name: String) {
+    Text(text = name)
+}
+
+    3. Layout (Yerleşim):
+Bu aşamada, oluşturulan bileşenlerin ekranda nasıl yerleşeceğine karar verilir. Yani, ekrandaki bileşenlerin boyutları ve konumları belirlenir.
+Compose, bileşenlerin nasıl düzenlenmesi gerektiğini hesaplar.
+
+* Örneğin, Row bileşenini kullanarak metin ve resmin yan yana görünmesini sağlayabilirsin:
+@Composable
+fun UserProfile(name: String, profileImage: ImageBitmap) {
+    Row {
+        Image(bitmap = profileImage, contentDescription = "Profile Image")
+        Text(text = name)
+    }
+}
+
+    4. Drawing (Çizim):
+Bu aşama, bileşenlerin ekrana çizildiği yerdir. Layout aşamasında belirlenen boyut ve konumlara göre, bileşenler gerçek anlamda ekrana çizilir.
+Burada ekranda gördüğümüz şeyler oluşmaya başlar: Metinler, resimler, Butonlar vs.
+
+5. UI (Kullanıcı Arayüzü):
+Son aşama, kullanıcı arayüzünün ekranda tamamlanmış hali. Kullanıcı artık arayüzle etkileşime geçebilir. Eğer veri değişirse,
+bu Compose aşamaları tekrar çalıştırılır ve arayüz otomatik olarak güncellenir.
+
+-   Özetle:
+* Data: Uygulamanın sahip olduğu bilgiler.
+* Composition: Verilere göre hangi bileşenlerin kullanılacağını belirleme.
+* Layout: Bu bileşenlerin ekranda nasıl yerleştirileceğine karar verme.
+* Drawing: Bileşenleri ekrana çizme.
+* UI: Son kullanıcı arayüzü.
+
+Bu süreç, Compose'un reaktif yapısının temelini oluşturur. Yani veriler değiştiğinde, UI otomatik olarak güncellenir
+ve bu sayede güncel bilgi her zaman kullanıcıya gösterilir.
+
+/*********************************************************************************************************************************************************************/
+
+-                Architecting your Compose UI (Compose kullanıcı arayüzünüzü tasarlama )
+
+    1. Compose’da UI Sabittir, Ama State (Durum) Değişir.
+Jetpack Compose'da kullanıcı arayüzü (UI) bir kez çizildiğinde tekrar güncellenmez. Ama kontrol edebileceğin şey UI'nin durumudur (state).
+Yani, ekranda gösterilen veriler (örneğin bir formdaki ad alanı) değiştiğinde, Compose sadece bu değişen parçayı yeniden oluşturur.
+
+* Örneğin, aşağıdaki kodda name adında bir state (durum) var. Kullanıcı metin alanına bir şeyler yazdığında, bu name durumu değişir ve metin alanı yeniden çizilir:
+
+    var name by remember { mutableStateOf("") }
+    OutlinedTextField(
+        value = name,
+        onValueChange = { name = it },
+        label = { Text("Name") }
+    )
+
+
+    2. Compose ve Tek Yönlü Veri Akışı (Unidirectional Data Flow - UDF)
+Jetpack Compose’da veri akışı tek yönlü olmalıdır. Yani, veri yukarıdan aşağıya akar (state aşağıya geçer), olaylar ise aşağıdan yukarıya (eventler yukarıya) akar.
+Bu desen, UI'yi veriden ayırmana yardımcı olur. Örneğin:
+
+* Bir düğmeye tıkladığında bu olay (event) yukarıya, ViewModel’e iletilir.
+* ViewModel durumu (state) günceller.
+* Bu yeni durum aşağıya UI'ye iletilir ve UI güncellenir.
+
+-!- UI'dan State'e event, State'den UI'a state aktarımı vardır.
+
+- Bu tek yönlü veri akışının sağladığı avantajlar:
+* Test edilebilirlik: UI ve veri ayrı tutulduğundan, her birini bağımsız olarak test etmek kolaydır.
+* State kapsülleme: Veri sadece bir yerde güncellenir, böylece hata yapma olasılığın azalır.
+* UI tutarlılığı: Verideki her değişiklik anında UI'ye yansır.
+
+
+    3. Compose’da State ve Event (Olay) Yönetimi
+(ÖNEMLİ!)-> Jetpack Compose'da UI, duruma (state) göre oluşturulur ve olaylar (eventler) üzerinden güncellenir.
+Örneğin, bir metin alanı (TextField), sadece value parametresi güncellenirse yeniden çizilir. Olay olarak, onValueChange ile yeni bir değer talep edilir.
+
+Durumları state objeleri ile tutarsın ve mutableStateOf() kullanarak gözlemlenebilir (observable) hale getirirsin. Durum değiştikçe Compose, o bileşeni tekrar oluşturur (recomposition).
+
+    var name by remember { mutableStateOf("") }
+* mutableStateOf("") durumu oluşturur.
+* remember bu durumu hatırlatır, bileşen ekrandan kalkana kadar bu değeri saklar.
+
+!- Eğer durumu cihaz döndürmeleri gibi durumlarda da korumak istersen, rememberSaveable kullanabilirsin:
+
+    var name by rememberSaveable { mutableStateOf("") }
+
+
+a-  mutableStateOf(value)
+* Bu fonksiyon, gözlemlenebilir bir MutableState oluşturur.
+* Bu, Jetpack Compose’da bir değişkenin değerinin takip edilmesi anlamına gelir.
+* Eğer bu değişkenin değeri değişirse, bu değeri okuyan tüm Composable fonksiyonlar yeniden çizilir (recompose).
+        var name by mutableStateOf("")
+Eğer name değişirse, bu name değişkenini kullanan tüm arayüzler otomatik olarak güncellenir.
+
+b-  remember
+* remember, bir değeri bellekte tutar. Ama bu değer, sadece bileşen ekranda olduğu sürece hatırlanır.
+* Eğer bu bileşen (Composable) ekrandan kaldırılırsa (mesela, başka bir ekrana geçiş yapılırsa), bu değer unutulur.
+        val counter = remember { mutableStateOf(0) }
+Ekran değişirse veya bileşen kaldırılırsa, counter sıfırlanır.
+
+c- rememberSaveable
+* rememberSaveable, remember ile aynı işlevi görür, ancak ek olarak cihaz döndürme gibi konfigürasyon değişikliklerinde de veriyi korur.
+* rememberSaveable, durumu bir Bundle içinde saklar, böylece ekran döndüğünde bile veri korunur.
+        val name = rememberSaveable { mutableStateOf("") }
+Ekran döndüğünde name aynı kalır. remember kullanılsaydı, ekran döndüğünde name sıfırlanırdı.
+
+
+-   Özet:
+* mutableStateOf: Gözlemlenebilir bir durum oluşturur ve durumu okuyan bileşenler duruma göre yeniden çizilir.
+* remember: Bileşen bellekte tutulur ama bileşen ekrandan kaldırıldığında unutulur.
+* rememberSaveable: Cihaz döndürme gibi durumlarda bile bileşen bellekte tutulur.
+
+/*********************************************************************************************************************************************************************/
+
+-   Bu bölümde, Jetpack Compose'da Event'ler (olaylar) ve ViewModel ile nasıl çalıştığından bahsediliyor.
+
+        1. Compose'da Event'ler Nedir?
+
+Bir uygulamada kullanıcıdan veya sistemden gelen her etkileşim bir event (olay) olarak temsil edilir. Örneğin:
+* Bir düğmeye tıklamak
+* Metin yazmak (form doldurmak)
+* Bir geri sayım zamanlayıcısının süresinin dolması
+Her olay, UI’nin durumu üzerinde değişiklik yapar ve bu durumda, ViewModel olayları ele almalı ve UI'nin durumunu güncellemelidir.
+Bu, uygulamanın tutarlı olmasını sağlar ve hata riskini azaltır.
+
+* Uygulamanıza yapılan her girdi bir olay(event) olarak temsil edilmelidir: dokunmalar, metin değişiklikleri ve hatta zamanlayıcılar veya diğer güncellemeler.
+Bu olaylar kullanıcı arayüzünüzün durumunu değiştirdiğinden, bunları işleyecek ve kullanıcı arayüzü durumunu güncelleyecek olan ViewModel olmalıdır.
+
+        2. State ve Event'lerin Yönetimi
+Jetpack Compose’da UI doğrudan state (durum) değiştirmemelidir. Bunun yerine, durum değişikliği yalnızca event handler (olay işleyici) içinde yapılmalıdır.
+Bu, hataların ve tutarsızlıkların önlenmesine yardımcı olur.
+
+        3. Neden Değiştirilemez (Immutable) Değerler Kullanılır?
+Olayları ve durumları tanımlarken değiştirilemez (immutable) değerler kullanmak önemlidir. Bunun birkaç avantajı vardır:
+
+* Yeniden kullanılabilirlik: Değiştirilemez değerler, bileşenlerin farklı yerlerde kullanılmasını kolaylaştırır.
+* Durum yönetimi: UI, durumu doğrudan değiştiremediği için tutarlı kalır.
+* Çoklu işlem sorunları: Durum başka bir iş parçacığından değiştirilmez, bu da eşzamanlılık sorunlarını önler.
+* Kod karmaşıklığını azaltır: Olay ve durumlar arasında net bir sınır olur.
+
+
+        4. ViewModel, State ve Event Kullanımı
+Jetpack Compose ile UI'nı yönetirken, uygulamanın hangi durumda olduğunu belirlemek ve kullanıcının etkileşimlerini yönetmek çok önemli.
+Burada ViewModel'i kullanarak, bu yönetimi nasıl yapabileceğin gösteriliyor.
+* State: Uygulamanın durumu, yani o an neyin gösterildiği.
+* Events: Kullanıcının yaptığı şeyler, örneğin bir butona tıklamak.
+
+Bir uygulama, genellikle ViewModel kullanarak UI'nin durumunu (state) yönetir. ViewModel, event’leri işleyerek durumu günceller. Örneğin, bir giriş ekranında:
+
+* Kullanıcı giriş yapmadığında: "Signed out" durumu
+* Giriş yapılırken: "In progress" durumu
+* Giriş hatalı olduğunda: "Error" durumu
+* Giriş başarılı olduğunda: "Signed in" durumu
+Bu farklı durumları yönetmek için, sealed class kullanarak bu dört durumu tanımlıyorsun. ViewModel,
+bu durumu yönetiyor ve olaylara göre (örneğin, kullanıcının "Giriş Yap" butonuna tıklaması) durumu güncelliyor.
+
+Bu durumları bir sealed class olarak modelleyebilirsin:
+sealed class UiState {
+    object SignedOut : UiState()
+    object InProgress : UiState()
+    data class Error(val message: String) : UiState()
+    object SignedIn : UiState()
+}
+
+-   ViewModel ve Event İşleme
+ViewModel bu durumu yönetir ve UI’ye sunar:
+class MyViewModel : ViewModel() {
+    private val _uiState = mutableStateOf<UiState>(UiState.SignedOut)
+    val uiState: State<UiState>
+        get() = _uiState
+
+    fun onSignIn() {
+        _uiState.value = UiState.InProgress
+        // Giriş işlemi burada yapılır
+        // Başarıyla tamamlanırsa _uiState.value = UiState.SignedIn
+        // Hata olursa _uiState.value = UiState.Error("Login failed")
+    }
+}
+
+        6. UI’de ViewModel Kullanımı
+Compose’da ViewModel durumunu gözlemleyip ekrana yansıtabilirsin:
+
+@Composable
+fun MyComposable(viewModel: MyViewModel) {
+    val uiState by viewModel.uiState.observeAsState()
+
+    when (uiState) {
+        is UiState.SignedOut -> {/* Giriş yapılmamış ekran */}
+        is UiState.InProgress -> {/* Yükleniyor spinner'ı */}
+        is UiState.Error -> {/* Hata mesajı */}
+        is UiState.SignedIn -> {/* Başarı ekranı */}
+    }
+}
+
+Bu sayede uygulamanın durumu ViewModel tarafından kontrol edilir ve UI güncel duruma göre güncellenir.
+
+-!   Özet:
+* Event’ler: Kullanıcı ve sistem etkileşimlerini temsil eder (tıklamalar, metin girişleri, zamanlayıcılar vb.).
+* State yönetimi: UI doğrudan state değiştirmez, sadece event’lerle bu yapılır.
+* ViewModel: Event'leri işleyip state'i yönetir ve UI'nin durumunu günceller.
+Bu yapı, Jetpack Compose’da uygulamanın daha tutarlı, yeniden kullanılabilir ve yönetilebilir olmasını sağlar.
+
+
+/*********************************************************************************************************************************************************************/
+
+Jetpack Compose mimarisini anlamak, farklı katmanların nasıl çalıştığını bilmekle başlar.
+Compose, tek bir büyük yapı değil; modüller halinde tasarlanmış ve bu modüller bir araya getirilerek bütün bir sistem oluşturulmuş. Her katman farklı bir sorumluluğa sahip
+
+-   Compose'in Katmanları
+Jetpack Compose'da dört ana katman bulunur. Her katman daha alttaki katmanların üzerine inşa edilmiştir, bu da her seviyede daha fazla soyutlama sunar:
+
+1- Runtime (Çalışma Zamanı Katmanı): Bu en alt katman, Compose’un temel özelliklerini sağlar.
+Örneğin, remember, mutableStateOf ve @Composable gibi yapı taşları buradan gelir.
+Eğer sadece Compose’un ağaç yapısı yönetimi gibi basit işlevlere ihtiyacın varsa, bu katmanla direkt çalışabilirsin.
+
+2- UI (Kullanıcı Arayüzü Katmanı): Bu katman, daha temel UI bileşenlerini içerir.
+Layout düzenleri, Modifier, giriş işlemleri (dokunma, tıklama), özel düzenler ve çizim işlemleri bu katmanda yapılır.
+Yani, bir kullanıcı arayüzü tasarlarken, bu katmandan faydalanabilirsin.
+
+3- Foundation (Temel Katman): Bu katman, UI oluşturmak için genel, tasarım sistemine bağımsız bileşenler sunar.
+Row, Column, LazyColumn gibi Compose’un temel yapıları bu katmandan gelir.
+Kendi özel tasarım sistemini oluşturmak istiyorsan bu katmanı kullanarak daha temel düzenler oluşturabilirsin.
+
+4- Material (Tasarım Katmanı): Bu en üst katman, Compose’un Material Design’ı uyguladığı katmandır.
+Tema yapısı, ikonlar ve Material bileşenleri bu katmandan gelir. Eğer uygulamanda Material Design kullanıyorsan, bu katmanla çalışırsın.
+
+-   Tasarım İlkeleri
+Jetpack Compose, modüler ve esnek bir yapı sunmayı hedefliyor. Yani, her şey küçük parçalar halinde tasarlanmış ve bu parçalar birleştirilerek daha büyük yapılar oluşturuluyor.
+Bu da esneklik sağlıyor; ihtiyacına göre daha düşük seviyeli bileşenlere geçebilirsin.
+
+Örneğin, bir bileşenin rengini değiştirmek istiyorsan, şu basit API’yi kullanabilirsin:
+        val color = animateColorAsState(if (condition) Color.Green else Color.Red)
+
+Ama daha fazla kontrol istiyorsan ve rengin ilk başta gri olmasını istiyorsan, daha alt seviye bir API'ye inebilirsin:
+    val color = remember { Animatable(Color.Gray) }
+    LaunchedEffect(condition) {
+        color.animateTo(if (condition) Color.Green else Color.Red)
+    }
+
+* Bu örnekte, animateColorAsState üst seviye bir API ve basit işler için uygun, ama daha fazla kontrol gerektiğinde Animatable gibi daha düşük seviyeli bir bileşene geçebilirsin.
+* Üst düzey animateColorAsState API'si, alt düzey Animatable API'si üzerine inşa edilmiştir. Alt seviye API'yi kullanmak daha karmaşıktır ancak daha fazla kontrol sunar.
+İhtiyaçlarınıza en uygun soyutlama seviyesini seçin.
+Bu yapıyı anlamak, ihtiyacına göre doğru seviyeyi seçerek uygulamanı daha etkili bir şekilde inşa etmene yardımcı olur.
+
+
+-   Doğru Abstraksiyon Seviyesini Seçmek
+Jetpack Compose’un katmanlı yapısı sayesinde, her zaman daha düşük seviyeli bileşenlere inmek zorunda değilsin.
+Daha yüksek seviyeli bileşenler hem işlevsellik sunar hem de genellikle en iyi uygulama örneklerini (erişilebilirlik desteği gibi) içerir.
+Örneğin, bir bileşene dokunma hareketleri eklemek istiyorsan, direkt olarak Modifier.pointerInput kullanarak sıfırdan inşa etmek yerine,
+daha yüksek seviyeli Modifier.draggable, Modifier.scrollable veya Modifier.swipeable bileşenlerini kullanmayı tercih edebilirsin.
+
+-   Özet
+* Compose’da özelleştirme yapmanın iki yolu var: ya mevcut bir bileşeni parametreleriyle özelleştirirsin ya da daha düşük seviyeden kendi bileşenini oluşturursun.
+* Mümkün olduğunca daha yüksek seviyeli bileşenleri kullanmak, erişilebilirlik gibi iyileştirmeleri senin için otomatik olarak sağlayacağından daha iyidir.
+* Kendi bileşenini oluşturduğunda dikkat etmen gereken, erişilebilirlik gibi kritik özellikleri gözden kaçırmamak.
