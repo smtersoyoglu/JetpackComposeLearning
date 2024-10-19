@@ -1,0 +1,128 @@
+-       Advanced State and Side Effects in Jetpack Compose
+
+-*   3. UI state production pipeline
+Bu döküman, Jetpack Compose ile uygulamanın UI (Kullanıcı Arayüzü) state'ini nasıl yöneteceğini anlatıyor.
+
+-   UI State Production Pipeline Nedir?
+Kısaca, UI State uygulamanın kullanıcılara gösterdiği verilerin (ekranda gördüğün şeyler) nasıl hazırlandığını ifade eder.
+Bu veriler uygulamanın arka planındaki bir veri katmanından (örneğin, bir API veya veritabanı) gelir ve işlenerek ekrana yansıtılır.
+
+- Burada iki ana adım var:
+
+* Veri üretme (state production): ViewModel’de veriyi hazırlamak.
+* Veriyi kullanma (state consumption): Hazırlanan veriyi UI’da göstermek.
+
+İlk adımda ViewModel, veri katmanından gelen veriyi alıp ekranda gösterebileceğimiz hale getiriyor. Bu dökümanda bu adımı nasıl yapacağımızı anlatıyor.
+
+1- 1. ViewModel İçinde UI State Üretimi
+Veriyi UI’da gösterebilmek için önce ViewModel’de bu veriyi hazırlaman gerekiyor.
+Bu dökümanda örnek olarak önerilen uçuş destinasyonlarının (gidebileceğin şehirlerin) bir listesini alıp ekranda göstereceğiz.
+
+İlk olarak, önerilen destinasyonların listesini saklayacak bir MutableStateFlow tanımlıyorsun:
+
+        private val _suggestedDestinations = MutableStateFlow<List<ExploreModel>>(emptyList())
+
+* MutableStateFlow<List<ExploreModel>>: Bu, bir liste şeklinde veriyi tutar. Örnek olarak ExploreModel denen bir modelle destinasyonları temsil ediyor.
+* emptyList(): Başlangıç değeri boş bir liste olacak.
+
+2. Sadece Okunabilir Bir StateFlow Tanımlama
+Veriyi doğrudan UI’dan değiştirmek istemezsin. Bu yüzden sadece ViewModel'den değiştirilip dışarıya (UI’ya) yalnızca okunabilir bir veri sunarız.
+Bunun için, MutableStateFlow'u sadece okunabilir bir hale getiren bir StateFlow oluşturuyoruz:
+
+        val suggestedDestinations: StateFlow<List<ExploreModel>> = _suggestedDestinations.asStateFlow()
+
+* Burada asStateFlow() ile _suggestedDestinations’ı immutable (sadece okunabilir) hale getiriyoruz.
+* UI bu suggestedDestinations’ı kullanarak veriyi gözlemleyip gösterecek ama değiştiremeyecek.
+
+3. init Bloğunda Veriyi Almak
+ViewModel ilk oluşturulduğunda, veriyi veri katmanından alman gerekiyor. Bu, init bloğu içinde yapılır.
+Örneğin, destinationsRepository adında bir veritabanından ya da API’den veri alıyorsun:
+
+        init {
+            _suggestedDestinations.value = destinationsRepository.destinations
+        }
+* destinationsRepository.destinations veriyi veri katmanından alır ve MutableStateFlow'un value'sine atar. Bu sayede UI güncel veriyi görebilecek.
+
+4- 4. ViewModel’de Verinin Güncellenmesi
+Veri, UI’dan gelecek olaylarla (örneğin bir butona tıklama gibi) güncellenebilir. _suggestedDestinations değişkeni burada bu olaylara göre güncellenir.
+
+   private val _suggestedDestinations = MutableStateFlow<List<ExploreModel>>(emptyList())
+
+   val suggestedDestinations: StateFlow<List<ExploreModel>> = _suggestedDestinations.asStateFlow()
+
+   init {
+       _suggestedDestinations.value = destinationsRepository.destinations
+   }
+
+Sonuç
+Bu adımlarla, ViewModel içerisinde veriyi (state’i) ürettin ve UI’ya sundun. Bu aşamadan sonra, UI bu veriyi gözlemleyip ekranda gösterebilir.
+
+- Bu süreçte dikkat etmen gereken:
+
+* StateFlow: UI’daki verilerin güncellenmesini sağlar.
+* MutableStateFlow vs. StateFlow: İçeride veriyi değiştirebilirsin (mutable), ama UI’ya yalnızca okunabilir bir yapı sunuyorsun (immutable).
+* Veri akışı: Veri önce veri katmanından (örneğin, repository’den) alınır, ViewModel’de işlenir ve UI’ya sunulur.
+
+
+/***************************************************************************************************************************************************************/
+
+Bu Bölüm, ViewModel'deki StateFlow'u güvenli bir şekilde UI’da nasıl tüketeceğini (consume) anlatıyor.
+Daha önce ViewModel'de veriyi üretmiştik. Şimdi bu veriyi UI tarafında (Composable'larda) nasıl kullanacağımızı görelim.
+
+-       1. UI’da StateFlow'u Kullanmak
+Jetpack Compose'da UI, ViewModel'den gelen state'e göre güncellenir.
+Burada CraneHomeContent adlı bir Composable'da önerilen destinasyonlar listesini (suggestedDestinations) göstereceğiz.
+
+collectAsStateWithLifecycle ile Veriyi Tüketmek
+CraneHomeContent composable'ında, suggestedDestinations'ı ViewModel'den alacağız ve ekranda göstereceğiz:
+@Composable
+fun CraneHomeContent(
+    onExploreItemClicked: OnExploreItemClicked,
+    openDrawer: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = viewModel(),
+) {
+    // ViewModel'den suggestedDestinations StateFlow'unu alıyoruz.
+    val suggestedDestinations by viewModel.suggestedDestinations.collectAsStateWithLifecycle()
+
+    // Bu listeyi ekranda göstermek için kullanacaksın.
+    // Örneğin, bir LazyColumn ile gösterebilirsin.
+}
+- Bu kod ne yapıyor?
+
+* collectAsStateWithLifecycle() fonksiyonu, StateFlow'dan gelen değerleri alır ve Compose’un State API'sine dönüştürür.
+Bu sayede, veri güncellendikçe UI otomatik olarak yeniden çizilir.
+* by ifadesi, değişkeni otomatik olarak güncellememizi sağlar. Böylece her yeni veri geldiğinde UI kendini yeniler.
+
+
+- Ekstra Bilgi: Farklı Akış (Stream) Türleri ile Çalışmak
+- Jetpack Compose, sadece StateFlow ile değil, LiveData ve RxJava gibi diğer akış temelli yapılarla da çalışabilir.
+Bunun için şu API'ler kullanılabilir:
+
+* LiveData: LiveData.observeAsState() ile kullanabilirsin. LiveData’yı Compose’a bağlar.
+* RxJava: Observable.subscribeAsState() ile kullanabilirsin.
+Bu şekilde, Jetpack Compose ile popüler veri akış yöntemlerini de rahatça kullanabilirsin.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
