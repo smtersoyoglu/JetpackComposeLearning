@@ -1,0 +1,353 @@
+-!!-      Jetpack Compose Navigation
+Jetpack Compose ile bir uygulamanın ekranları arasında geçişi yönetmek için Compose Navigation kullanıyoruz.
+Navigation, uygulama içindeki ekran geçişlerini düzenleyip yönetmek için kullanılan bir yapıdır.
+
+
+-!!- Navigation Compose’un 3 temel bileşeni sırasıyla şunlardır: “Navigation Graph”, “NavHost” ve “NavController”.
+Bu üç bileşen, Navigation Compose kullanılarak uygulamalarda etkili bir şekilde gezinme sağlamak için birlikte çalışır.
+* NavHost, mevcut gezinme durumunu temsil eder.
+* NavController, bu durumu yöneterek uygulama içindeki gezinmeyi kontrol eder. (Hedefler (ekranlar veya bileşenler) arasında gezinmekten sorumludur)
+* Navigation Graph ise tüm gezinme hedeflerini ve aralarındaki ilişkileri tanımlar.
+
+!-!     Jetpack Compose'da temel geçiş birkaç adımı takip eder:
+-   1. Navigation Bağımlılığını Ekleme; (İlk adım olarak, uygulamanın build.gradle dosyasına Compose Navigation bağımlılığını eklemelisin.)
+
+-   2. NavController'ı Kurma;
+NavController, Compose'da navigasyonun merkezidir.
+Uygulamanın hangi ekranda olduğunu takip eder, geri yığının (back stack) kontrolünü sağlar ve ekranlar arasında geçiş yapar.
+Yani, NavController, uygulamanın hangi ekranda olduğunu bilerek o ekranlar arasında geçişi yönetir.
+(NavController, uygulama navigasyonunu yönetmekten sorumludur. Arka yığını idare eder, navigasyon eylemlerini gerçekleştirir ve
+hedef argümanlarını yönetir.)
+
+* NavController'ı oluşturmak için rememberNavController() fonksiyonunu kullanıyoruz.
+Bu, NavController'ın uygulamanın durumu değiştiğinde (örneğin ekran döndüğünde) bile hatırlanmasını sağlar:
+                    val navController = rememberNavController()
+NavController'ı genelde uygulamanın en üst seviyesinde (App composable gibi) oluşturman gerekir,
+böylece diğer tüm composable'lar ona erişebilir ve navigasyon işlemlerini buradan yönetebilirsin.
+
+Örneğin, RallyApp fonksiyonunda NavController şu şekilde eklenir:
+@Composable
+fun RallyApp() {
+    RallyTheme {
+        val navController = rememberNavController()  // NavController oluşturuluyor
+        Scaffold(
+            // ...
+        ) {
+            // ...
+        }
+    }
+}
+
+/**-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
+
+-!!-  3. NavHost ve Navigasyon Grafiği Oluşturma;
+NavHost, NavController ile bir navigasyon grafiği (NavGraph) arasında bağlantı kuran bir container’dır.
+Uygulamanın hangi ekranda olduğunu belirler ve ekranlar arasında geçiş yapıldığında ilgili composable’ı gösterir.
+( “NavHost”, uygulamadaki ekran geçişlerini düzenlememizi sağlayan bir yapıdır.
+Temel olarak, “Navigation Graph” adını verdiğimiz bir yol haritası oluşturmamıza yardımcı olur.
+Bu yol haritası, uygulamamızdaki ekranlar arasındaki geçişleri tanımlar.
+“NavHost” içerisinde oluşturduğumuz her bir “Composable” bizim ekranlarımızı ve yollarını temsil eder)
+
+NavHost şu şekilde oluşturulur:
+NavHost(
+    navController = navController,
+    startDestination = Overview.route,  // Uygulama ilk açıldığında gösterilecek ekran
+    modifier = Modifier.padding(innerPadding)
+) {
+    // Burada navigasyon grafiği tanımlanacak
+}
+
+/**-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
+
+-!!-  4. Rotaların (Routes) Tanımlanması
+Her bir ekran için bir route (yol) tanımlamanız gerekir. Bu route, NavController’ın belirli bir ekrana nasıl geçeceğini belirler.
+Yani route, ekranın adresi gibidir. Rally uygulamasında ekranlar (Overview, Accounts, Bills) için route'lar şu şekilde tanımlanmış:
+val Overview = object : RallyDestination {
+    override val route = "overview"
+    override val icon = Icons.Default.Home
+    override val screen: @Composable () -> Unit = { OverviewScreen() }
+}
+
+val Accounts = object : RallyDestination {
+    override val route = "accounts"
+    override val icon = Icons.Default.AccountBalance
+    override val screen: @Composable () -> Unit = { AccountsScreen() }
+}
+
+val Bills = object : RallyDestination {
+    override val route = "bills"
+    override val icon = Icons.Default.Payment
+    override val screen: @Composable () -> Unit = { BillsScreen() }
+}
+
+/**-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
+
+-!!-   5. Composable Destinasyonlarını NavGraph’a Ekleme
+Şimdi her bir destinasyonu (yani ekranı) navigasyon grafiğine eklemen gerekiyor.
+Bu, NavGraphBuilder’in composable uzantı fonksiyonu ile yapılır. Örneğin, Overview ekranı şu şekilde eklenir:
+
+NavHost(
+    navController = navController,
+    startDestination = Overview.route,
+    modifier = Modifier.padding(innerPadding)
+) {
+    composable(route = Overview.route) {
+        Overview.screen()  // Overview ekranını gösterir
+    }
+    composable(route = Accounts.route) {
+        Accounts.screen()  // Accounts ekranını gösterir
+    }
+    composable(route = Bills.route) {
+        Bills.screen()  // Bills ekranını gösterir
+    }
+}
+Bu yapı, uygulamanın açılış ekranını (startDestination) ve diğer ekranlar arasındaki geçişleri belirler.
+Artık uygulamayı çalıştırdığında, ilk olarak Overview ekranı açılacak ve NavController ile diğer ekranlara geçiş yapabileceksin.
+
+/**-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
+
+-!!-      Jetpack Compose kullanarak tab navigation yapısı
+
+-*   RallyTabRow ve Navigation İlişkisi:
+
+Buradaki amacımız, kullanıcının RallyTabRow’da (yani üstteki sekmeler) bir sekmeye tıkladığında doğru ekrana yönlendirilmesini sağlamak.
+
+
+1- navController Kullanımı: navController, bir ekrandan diğerine geçişleri (navigasyon) yöneten bir araçtır.
+Burada, RallyTabRow'daki her sekmeye tıklandığında hangi ekrana gidileceğini ayarlamak için kullanacağız.
+
+2- onTabSelected Callback’i: onTabSelected, bir sekmeye tıklandığında ne yapılması gerektiğini tanımlar. Bu, hangi ekranın açılacağını belirlemek için kullanılır.
+
+onTabSelected = { newScreen ->
+    navController.navigate(newScreen.route)
+}
+Bu kod, kullanıcının tıkladığı sekmenin route'una göre ilgili ekrana geçiş yapar.
+
+-*   Tek Bir Kopya Başlatma Sorunu ve Çözümü:
+
+1- Sorun: Aynı sekmeye tekrar tıkladığınızda aynı ekran üst üste açılıyor. Yani bir ekranın birden fazla kopyası üst üste geliyor.
+
+2- Çözüm - launchSingleTop: Bu sorunu çözmek için, navController.navigate komutuna launchSingleTop özelliğini ekleyebiliriz. Bu özellik sayesinde, aynı ekrandan sadece bir tane açılır.
+
+navController.navigate(route) { launchSingleTop = true }
+Bu davranışı her yerde kullanmak istiyorsak, navigateSingleTopTo adında bir yardımcı fonksiyon oluşturabiliriz:
+
+fun NavHostController.navigateSingleTopTo(route: String) =
+    this.navigate(route) { launchSingleTop = true }
+
+Bu sayede navController.navigate yerine navController.navigateSingleTopTo fonksiyonunu çağırarak aynı özellikten her yerde faydalanabiliriz.
+
+Bu sayede:
+
+* Aynı sekmeye tekrar tıklasanız bile sadece bir tane ilgili ekran açılır.
+* Kod daha düzenli ve her çağrıda launchSingleTop eklemek zorunda kalmazsınız.
+
+
+-*  Navigasyon Seçeneklerini ve Geri Yığın Durumunu Kontrol Etme:
+
+launchSingleTop dışında, NavOptionsBuilder'dan daha fazla navigasyon davranışını kontrol etmek ve özelleştirmek için kullanabileceğiniz diğer bayraklar da vardır.
+RallyTabRow, bir BottomNavigation gibi davrandığı için, ona yöneldiğinizde ve geri döndüğünüzde bir varlığın durumunu kaydedip geri yüklemek isteyip istemediğinizi düşünmelisiniz.
+Örneğin, Overview ekranında en aşağıya kaydırdıktan sonra Accounts ekranına geçip geri döndüğünüzde, kaydırma konumunu korumak ister misiniz?
+RallyTabRow'da aynı varlığa yeniden tıkladığınızda ekran durumunu yeniden yüklemek ister misiniz? Tüm bunlar geçerli sorulardır ve uygulama tasarımınızın gereksinimlerine göre belirlenmelidir.
+
+
+- navigateSingleTopTo uzantı fonksiyonunda kullanabileceğiniz bazı ek seçenekler şunlardır:
+
+* launchSingleTop = true: Bu bayrak, geri yığınında bir varlığın en üstünde en fazla bir kopyasının olmasını sağlar.
+Rally uygulamasında, bu, aynı sekmeye birden fazla kez tıklamanın aynı varlığın birden fazla kopyasını başlatmaması anlamına gelir.
+
+* popUpTo(startDestination) { saveState = true }: Geri yığınında büyük bir varlık yığını oluşturmamak için grafik başlangıç varlığına kadar geri döner.
+Rally'de, bu, herhangi bir varlıktan geri okuna bastığınızda yığının tamamının Overview'a geri döneceği anlamına gelir.
+
+* restoreState = true: Bu navigasyon eyleminin, daha önce PopUpToBuilder.saveState veya popUpToSaveState özniteliklerini kullanarak kaydedilmiş
+herhangi bir durumu geri yükleyip yüklemeyeceğini belirler. Eğer, geri gidilen varlık kimliği ile daha önce hiçbir durum kaydedilmediyse,
+bu bayrağın hiçbir etkisi olmaz. Rally'de, bu, aynı sekmeye yeniden tıklamanın, ekranın üzerindeki önceki verileri ve kullanıcı durumunu tekrar yüklemeden koruyacağı anlamına gelir.
+
+
+-   Bu seçenekleri kodunuza tek tek ekleyebilir, her seferinde uygulamayı çalıştırarak her bayrağın navigasyon ve geri yığın durumunu nasıl değiştirdiğini görebilirsiniz.
+Bu şekilde, her bayrağın etkisini pratikte gözlemleyebilirsiniz.
+
+// Navigasyon işlemlerini basit hale getirmek için bir uzantı fonksiyonu tanımlıyoruz
+fun NavHostController.navigateSingleTopTo(route: String) =
+    this.navigate(route) {
+        popUpTo(
+            this@navigateSingleTopTo.graph.findStartDestination().id // Başlangıç varlığına geri dön
+        ) {
+            saveState = true // Mevcut durumu kaydet
+        }
+        launchSingleTop = true // Aynı varlığın yalnızca tek bir örneğinin üstte olmasını sağlar
+        restoreState = true // Daha önce kaydedilen durumu geri yükler
+    }
+
+Özetle:
+Bu navigasyon mekanizması, kullanıcı deneyimini geliştirmek için tasarlanmıştır. RallyTabRow kullanarak ekranlar arasında geçiş yaparken,
+kullanıcıların daha önceki durumlarını korumak ve yeniden yüklemeleri önlemek gibi davranışları özelleştirmek için çeşitli seçenekler sunar.
+Kullanıcılar bir sekmeye tekrar tıkladıklarında, önceki durumu koruyarak ekranın aynı durumda kalmasını sağlayabilirsiniz.
+ Bu sayede kullanıcılar, uygulamanızda gezinirken daha akıcı ve tutarlı bir deneyim yaşarlar.
+
+/**-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
+
+-!!-  7. Navigating to SingleAccountScreen with arguments
+- Argumentlarla Navigasyon: Jetpack Compose Navigation'da ekranlar arasında geçiş yaparken, belirli bir veriyle geçiş yapmak gerekebilir.
+Bu durumda, argümanlar kullanılır.
+Arguments Kullanımı: Jetpack Compose'da arguments, dinamik bilgi sağlamak için kullanılan güçlü bir araçtır.
+Ekranlar arasında veri taşımak ve ekranların farklı içerikler göstermesini sağlamak için kullanılır.
+
+- SingleAccountScreen için Argüman Tanımlama:
+
+* NavHost içindeki composable tanımlamasında, arguments listesine account_type adında bir argüman eklenir.
+* Bu argüman NavType.StringType olarak belirlenir, yani bir String türünde bilgi bekler.
+
+composable(
+    route = "${SingleAccount.route}/{${SingleAccount.accountTypeArg}}",
+    arguments = SingleAccount.arguments
+) { navBackStackEntry ->
+    val accountType = navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
+    SingleAccountScreen(accountType)
+}
+
+
+- NavGraph Argüman Tanımlama: NavGraphBuilder içindeki composable işlevinde arguments parametresini kullanarak hedef ekran için argüman tanımlanır.
+Örneğin:
+
+composable(
+    route = "account/{accountId}",
+    arguments = listOf(navArgument("accountId") { type = NavType.StringType })
+) { backStackEntry ->
+    // Argument'i çekme
+    val accountId = backStackEntry.arguments?.getString("accountId")
+    SingleAccountScreen(accountId)
+}
+
+- NavBackStackEntry Kullanımı: navBackStackEntry ile geçilen argüman arguments?.getString(...) yöntemiyle çekilir ve ekrana parametre olarak verilir.
+
+- Dynamic Route: Dinamik rota tanımlarken, {accountId} şeklinde süslü parantezler kullanılarak argüman alanı belirtilir.
+
+- Argument Geçişi: navController.navigate("account/12345") gibi bir komutla, accountId yerine geçecek bir değerle hedefe gidilir.
+
+Bu adımlar, ekranlara belirli verilerle geçiş yapmayı sağlar ve aynı ekranın farklı içeriklerle dinamik bir şekilde kullanılmasına olanak tanır.
+
+- RallyDestination Sınıfına Argüman ve Route Tanımlama:
+SingleAccount nesnesine accountTypeArg ve routeWithArgs tanımlamaları eklenerek, kod okunabilir ve yeniden kullanılabilir hale getirilir.
+
+object SingleAccount : RallyDestination {
+    override val route = "single_account"
+    const val accountTypeArg = "account_type"
+    val routeWithArgs = "${route}/{${accountTypeArg}}"
+    val arguments = listOf(navArgument(accountTypeArg) { type = NavType.StringType })
+}
+
+- Önceki Ekrandan Argümanla Geçiş: OverviewScreen veya AccountsScreen gibi önceki ekranlarda, kullanıcı bir hesap türüne tıkladığında
+ navController.navigateSingleTopTo("${SingleAccount.route}/$accountType") şeklinde argümanla geçiş yapılır.
+
+- Helper Fonksiyon Kullanımı: Kodun temiz kalması için NavHostController sınıfında özel bir navigateToSingleAccount fonksiyonu tanımlanır
+ve bu fonksiyon argümanla geçiş yapar.
+
+private fun NavHostController.navigateToSingleAccount(accountType: String) {
+    this.navigateSingleTopTo("${SingleAccount.route}/$accountType")
+}
+
+/**-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
+
+-!!- 8. Enable Deep Link Support
+Deep Links, kullanıcıların uygulama içindeki belirli bir sayfaya, etkinliğe yönlendirmek için kullanılan ve uygulamaya veri aktarabildiğimiz URL’dir.
+Deep Link'ler, uygulamanızın belirli bir içeriğine doğrudan erişim sağlar ve kullanıcı deneyimini geliştirebilir.
+
+- Deep Links'in Temel Bileşenleri:
+
+* NavController: Uygulamanızda navigasyon işlemleri için kullanılır.
+* NavHost: Navigasyon grafiğini belirlemek için kullanılır.
+* Deep Link Oluşturma: Belirli bir URL ile yönlendirme sağlamak için kullanılır.
+
+- Örnek Kod:
+val navController = rememberNavController()
+NavHost(navController = navController, startDestination = "first_page") {
+    composable("first_page") {
+        FirstPage(navController)
+    }
+}
+
+- Deep Link Oluşturma: Deep Link oluşturuyoruz ve yönlendireceğimiz etkinlik URL’i içerisine yazıyoruz.
+
+composable(
+    route = "second_page",
+    deepLinks = listOf(
+        navDeepLink {
+            uriPattern = "https://www.app.com"
+        }
+    )
+) {
+    Text(text = "Second Page")
+}
+
+- AndroidManifest.xml Ayarları: Deep Link'i uygulamanıza eklemek için AndroidManifest.xml dosyasına intent-filter ekleyin.
+<intent-filter>
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data
+        android:host="www.app.com"
+        android:scheme="https" />
+</intent-filter>
+
+- Önemli Notlar:
+
+* Deep Links, kullanıcıların uygulamanızın belirli kısımlarına doğrudan erişmesini sağlar, bu da kullanıcı etkileşimini artırabilir.
+* Uygulamanızda Deep Link'leri doğru bir şekilde yapılandırmak, dış uygulamaların ve web sayfalarının uygulamanızı açmasını kolaylaştırır.
+* Uygulamanızın hangi URL'lerin Deep Link olarak kullanılabileceğini iyi planlamak önemlidir.
+
+/**-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
+
+-!!-    10. Compose Navigasyonunu Test Etme
+
+1- Test Bağımlılıkları: Uygulamanın build.gradle dosyasına gerekli test bağımlılıklarını eklemen gerekir.
+Özellikle androidTestImplementation ile navigation-testing bağımlılığını ekle.
+dependencies {
+    // ...
+    androidTestImplementation "androidx.navigation:navigation-testing:$rootProject.composeNavigationVersion"
+    // ...
+}
+
+2- Test Sınıfını Hazırlama: NavigationTest adında bir test sınıfı oluştur ve Compose test API'lerini kullanabilmek için bir ComposeTestRule ekle.
+class NavigationTest {
+    @get:Rule
+    val composeTestRule = createComposeRule()
+    lateinit var navController: TestNavHostController
+}
+
+3- İlk Testi Yazma: RallyNavHost'u test etmek için bir test fonksiyonu oluştur. Bu fonksiyonda setContent ile test edilecek olan Compose içeriğini ayarlamalısın.
+@Test
+fun rallyNavHost_verifyOverviewStartDestination() {
+    composeTestRule.setContent {
+        navController = TestNavHostController(LocalContext.current)
+        navController.navigatorProvider.addNavigator(ComposeNavigator())
+        RallyNavHost(navController = navController)
+    }
+
+    composeTestRule
+        .onNodeWithContentDescription("Overview Screen")
+        .assertIsDisplayed()
+}
+
+4- Navigasyonu Test Etme: Kullanıcı arayüzündeki tıklamaları simüle ederek ve ardından hangi ekranın görüntülendiğini doğrulayarak navigasyonun doğru çalıştığını test et.
+@Test
+fun rallyNavHost_clickAllAccount_navigatesToAccounts() {
+    composeTestRule
+        .onNodeWithContentDescription("All Accounts")
+        .performClick()
+
+    composeTestRule
+        .onNodeWithContentDescription("Accounts Screen")
+        .assertIsDisplayed()
+}
+
+5- Tekrar Eden Kodları Önleme: Her test için RallyNavHost'u yeniden başlatmak yerine, bunun ayarını bir @Before fonksiyonuna çıkararak kod tekrarını önle.
+
+@Before
+fun setupRallyNavHost() {
+    // Test içeriğini burada ayarla
+}
+
+6- Yardımcı Fonksiyonlar: Navigasyon testlerini yazarken, kullanıcı tıklamalarını simüle etmek veya mevcut rotayı kontrol etmek için yardımcı fonksiyonlar kullanabilirsin.
+
+7- Tüm Testleri Çalıştırma: Test sınıfını tamamladıktan sonra tüm testleri çalıştırarak hepsinin geçtiğinden emin ol.
